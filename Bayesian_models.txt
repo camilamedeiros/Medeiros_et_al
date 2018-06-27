@@ -1,0 +1,53 @@
+Relative growth rate model:
+
+model{
+  for(j in 1:nspecies){
+    for(i in 1:ntree[j]){
+      DBH2[j,i] ~ dnorm(z[j,i], tau)
+      z[j,i] <- exp(d[j,i])
+      d[j,i] <- log(DBH1[j,i]) + RGRdbh[j,i] * deltat[j,i] 
+      RGRdbh[j,i] <- alpha[j,1] + alpha[j,2] * log(DBH1[j,i])
+    }
+    alpha[j,1] ~ dnorm(mu1 , gamma1)
+    alpha[j,2] ~ dnorm(mu2 , gamma2)
+  }
+    
+# Priors:
+mu1 ~ dnorm(0 , 10-4)
+mu2 ~ dnorm(0 , 10-4)
+    
+tau ~ dgamma(10-2 , 10-2)
+gamma1 ~ dgamma(10-2 , 10-2)
+gamma2 ~ dgamma(10-2 , 10-2)
+}
+
+
+
+Mortality rate model:
+
+model{
+  for(j in 1:nspecies){
+    for(i in 1:ntree[j]){
+      Si[j,i] ~ dbern(p[j,i])
+
+      p[j,i] <- exp(-MM[j,i] * deltat[j,i])
+
+      MM[j,i] ~ dnorm(z[j,i], tau)
+      z[j,i] <- exp(c[j,i]) 
+      m[j,i] <- beta[j,1] + beta[j,2] * log(D1[j,i]) + beta[j,3] * D1[j,i]
+    }
+  beta[j,1] ~ dnorm(mu1 , gamma1)
+  beta[j,2] ~ dnorm(mu2 , gamma2)
+  beta[j,3] ~ dnorm(mu3 , gamma3)
+  }
+    
+# Priors:
+mu1 ~ dnorm(0 , 10-4)
+mu2 ~ dnorm(0 , 10-4)
+mu3 ~ dnorm(0 , 10-4)
+    
+tau ~ dgamma(10-2 , 10-2)
+gamma1 ~ dgamma(10-2 , 10-2)
+gamma2 ~ dgamma(10-2 , 10-2)
+gamma3 ~ dgamma(10-2 , 10-2)
+}
